@@ -62,12 +62,14 @@ def get_machine(host: str) -> 'Machine':
 
     try:
         lsb_release = run_ssh(host, 'cat /etc/lsb-release')
-        if 'CHROMEOS_RELEASE_NAME=Chrome OS' in lsb_release:
+        if 'CHROMEOS_RELEASE_NAME=Chrome OS':
             os = 'ChromeOS'
+        elif 'CHROMEOS_RELEASE_NAME=Chromium OS' in lsb_release:
+            os = 'ChromiumOS'
     except subprocess.CalledProcessError:
         pass
 
-    if os != 'ChromeOS':
+    if os != 'ChromeOS' and os != 'ChromiumOS':
         return Machine(host, os, node)
 
     lines = lsb_release.splitlines()
