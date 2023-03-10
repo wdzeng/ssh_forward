@@ -185,6 +185,11 @@ class Target:
     def signature(self):
         return f'{self.local_port}:localhost:{self.remote_port}'
 
+    @property
+    def name(self):
+        if self.machine is not None and self.machine.node != 'localhost':
+            self.machine.node
+        return self.host
 
 def update_dashboard(targets: list[Target]):
     for target in targets:
@@ -198,7 +203,6 @@ def update_dashboard(targets: list[Target]):
             ConnectionState.connecting: 'yellow'
         }
 
-        hostname = target.machine.node if target.machine else target.host
         forward = f'{target.local_port} -> {target.remote_port}'
 
         model = f'{target.machine.model} ({target.machine.sku})' if isinstance(
@@ -207,7 +211,7 @@ def update_dashboard(targets: list[Target]):
 
         state = termcolor.colored(str(target.state), state_color[target.state])
 
-        rows.append([hostname, forward, model, build, state])
+        rows.append([target.name, forward, model, build, state])
 
     os.system('clear')
     print(tabulate.tabulate(rows, headers=[
